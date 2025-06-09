@@ -1,0 +1,32 @@
+esphome:
+  name: led-temp
+  friendly_name: led-temp
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "dpf8FmPevthTq/9Ax3CdLWvv1prl7HrY5ZczChuRlE4="
+
+ota:
+  - platform: esphome
+    password: "6b347a0e3e5b1c93f0d8ba330b60e277"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Led-Temp Fallback Hotspot"
+    password: "DxTbO0QrvUE0"
+
+captive_portal:
+    

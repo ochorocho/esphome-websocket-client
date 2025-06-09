@@ -1,0 +1,68 @@
+esphome:
+  name: distance
+
+esp32:
+  board: seeed_xiao_esp32c3
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Minimal API just to satisfy ESPHome validation
+api:
+
+ota:
+  - platform: esphome
+    password: ""
+
+# External component for WebSocket functionality
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [websocket_client]
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Optional manual IP
+  manual_ip:
+    static_ip: 192.168.178.47
+    gateway: 192.168.178.1
+    subnet: 255.255.255.0
+    dns1: 192.168.178.1
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Distance Fallback Hotspot"
+    password: "NgKJjgkae1Rb"
+
+captive_portal:
+    
+sensor:
+  - platform: ultrasonic
+    id: mysensor
+    trigger_pin: GPIO6
+    echo_pin: GPIO7
+    name: "Ultrasonic Sensor"
+    timeout: 4m
+    force_update: true
+    update_interval: 1s
+
+# WebSocket client component
+websocket_client:
+  url: "ws://192.168.178.38:3333/"
+  sensors:
+    - sensor_id: mysensor
+      name: "distance"
+  reconnect_interval: 60s
+  heartbeat_interval: 30s
+
+# Add real time clock (RTC) support
+time:
+  - platform: sntp
+    # No need to reference the time componente in the "websocket_client"
+    id: my_time
+    timezone: Europe/Berlin

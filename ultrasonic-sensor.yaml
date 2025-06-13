@@ -10,7 +10,7 @@ esp32:
 logger:
 
 # Minimal API just to satisfy ESPHome validation
-api:
+# api:
 
 ota:
   - platform: esphome

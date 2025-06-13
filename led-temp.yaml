@@ -1,23 +1,32 @@
 esphome:
   name: led-temp
-  friendly_name: led-temp
+  # Automatically trigger the custom effect on boot
+  on_boot:
+    priority: -100
+    then:
+      - light.turn_on:
+          id: led_matrix_32x8
+          brightness: 50%
+          effect: "K.I.T.T."
 
 esp32:
-  board: esp32-c3-devkitm-1
+  board: seeed_xiao_esp32c3
   framework:
     type: arduino
 
 # Enable logging
 logger:
 
-# Enable Home Assistant API
-api:
-  encryption:
-    key: "dpf8FmPevthTq/9Ax3CdLWvv1prl7HrY5ZczChuRlE4="
-
 ota:
   - platform: esphome
-    password: "6b347a0e3e5b1c93f0d8ba330b60e277"
+    password: ""
+
+# Include custom/external components
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [websocket_client]
 
 wifi:
   ssid: !secret wifi_ssid
@@ -25,8 +34,95 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Led-Temp Fallback Hotspot"
-    password: "DxTbO0QrvUE0"
+    ssid: "LED Fallback Hotspot"
+    password: "NgKJjgkae1Rb"
 
 captive_portal:
     
+sensor:
+  - platform: adc
+    pin: GPIO3
+    id: brightness_sensor
+    name: "Living Room Brightness"
+    update_interval: 5s
+  - platform: dht
+    pin: GPIO6
+    update_interval: 5s
+    temperature:
+      name: "Temperature"
+      id: dht22_temperature
+    humidity:
+      name: "Humidity"
+      id: dht22_humidity
+
+# Add real time clock (RTC) support
+time:
+  - platform: sntp
+    # No need to reference the time component in the "websocket_client"
+    id: my_time
+    timezone: Europe/Berlin
+
+# LED Stripe Configuration
+light:
+  - platform: fastled_clockless
+    chipset: WS2812B
+    pin: GPIO20  # Adjust this to your actual GPIO
+    num_leds: 19
+    rgb_order: GRB
+    name: "Living Room LED Strip"
+    id: led_matrix_32x8
+    restore_mode: ALWAYS_OFF
+    default_transition_length: 0s
+    effects:
+      - random:
+      - strobe:
+      - flicker:
+      - addressable_rainbow:
+      - addressable_color_wipe:
+      - addressable_scan:
+      - addressable_scan:
+          name: Scan Effect With Custom Values
+          move_interval: 500ms
+          scan_width: 3
+      - addressable_twinkle:
+      - addressable_lambda:
+          name: "K.I.T.T."
+          update_interval: 0.2s
+          lambda: |-
+            static int pos = 0;
+            static bool forward = true;
+
+            for (int i = 0; i < it.size(); i++) {
+              uint8_t red = (uint8_t)(it[i].get_red() * 0.6);  // fade red component
+              // keep green and blue at 0 for red trail
+              it[i] = Color(red, 0, 0);
+            }
+
+            it[pos] = Color(255, 0, 0);
+
+            if (forward) {
+              pos++;
+              if (pos >= it.size() - 1) forward = false;
+            } else {
+              pos--;
+              if (pos <= 0) forward = true;
+            }
+
+
+
+# # WebSocket client component
+# websocket_client:
+#   url: "ws://192.168.178.38:3333/"
+#   # @todo: Why is this underlines in vscode?
+#   # send_all_updates: true  # Send every measurement, you want this for testing only!
+#   min_change_threshold: 0.01
+#   # @todo: Instead if mapping the sensors and such here, add some logic to read it from the "root level sensor"?
+#   sensors:
+#     - sensor_id: brightness_sensor
+#       name: "Brightness Sensor"
+#     - sensor_id: "dht22_temperature"
+#       name: "dht22_temperature"
+#     - sensor_id: "dht22_humidity"
+#       name: "dht22_humidity"
+#   reconnect_interval: 60s
+#   heartbeat_interval: 30s

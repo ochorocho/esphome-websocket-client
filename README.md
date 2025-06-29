@@ -28,6 +28,30 @@ Heartbeat message:
 }
 ```
 
+## Lights
+
+on
+```json
+{
+    "type": "light_control",
+    "device_id": "led-temp",
+    "light_id": "Living Room LED Strip",
+    "action": "turn_on",
+    "effect": "K.I.T.T.",
+    "brightness": 0.9
+}
+```
+
+off
+```json
+{
+    "type": "light_control",
+    "device_id": "led-temp",
+    "light_id": "Living Room LED Strip",
+    "action": "turn_off"
+}
+```
+
 # ESPHome
 
 ## MicroController: Initial setup

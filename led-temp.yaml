@@ -108,21 +108,20 @@ light:
               if (pos <= 0) forward = true;
             }
 
-
-
-# # WebSocket client component
-# websocket_client:
-#   url: "ws://192.168.178.38:3333/"
-#   # @todo: Why is this underlines in vscode?
-#   # send_all_updates: true  # Send every measurement, you want this for testing only!
-#   min_change_threshold: 0.01
-#   # @todo: Instead if mapping the sensors and such here, add some logic to read it from the "root level sensor"?
-#   sensors:
-#     - sensor_id: brightness_sensor
-#       name: "Brightness Sensor"
-#     - sensor_id: "dht22_temperature"
-#       name: "dht22_temperature"
-#     - sensor_id: "dht22_humidity"
-#       name: "dht22_humidity"
-#   reconnect_interval: 60s
-#   heartbeat_interval: 30s
+# WebSocket client component
+websocket_client:
+  url: "ws://192.168.178.38:3333/"
+  # send_all_updates: true  # Send every measurement, you want this for testing only!
+  min_change_threshold: 0.01
+  sensors:
+    - sensor_id: brightness_sensor
+      name: "Brightness Sensor"
+    - sensor_id: "dht22_temperature"
+      name: "dht22_temperature"
+    - sensor_id: "dht22_humidity"
+      name: "dht22_humidity"
+  lights:
+    - light_id: led_matrix_32x8
+      name: "Living Room LED Strip"
+  reconnect_interval: 10s
+  heartbeat_interval: 10s
